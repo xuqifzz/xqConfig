@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../xqConfig.wrap.js"></script>
+    
+    <title>缓存示例</title>
+</head>
+<body>
+    <script>
+        var calcAdd = function(x,y,fun){
+            console.log('run a heavy opertation');
+            var fun2 = function(){
+                fun(x+y);
+            }
+            setTimeout(fun2,2000);
+        }
+        
+
+
+        var chcheFun = xqConfig.toolFun.cacheAsynFun(calcAdd);
+
+
+        for(var i=0;i<3;i++){
+            chcheFun(1,2,function(res){
+                console.log(res);
+            })
+        }
+        for(var i=0;i<4;i++){
+            chcheFun(3,5,function(res){
+                console.log(res);
+            })
+        }
+
+
+        
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../xqConfig.wrap.js"></script>
+
+    <title>单实体属性配置</title>
+</head>
+
+<body>
+    <div id='testDiv'>
+
+
+    </div>
+
+    <script>
+        xqConfig.props.regComboProp('sp', [
+            ['选项1', 1],
+            ['选项2', 2],
+            ['选项3', 3]
+        ]);
+
+
+        var xtype = {
+            type: 'select',
+            isInt: true,
+            getData: function (fun) {
+
+                setTimeout(function () {
+                    console.log("ok11");
+                    fun([{
+                        text: "选项1",
+                        value: 1
+                    }, {
+                        text: "选项2",
+                        value: 2
+                    }])
+
+                }, 1000);
+
+            }
+
+        }
+
+        var ytype = {
+            type: 'tree',
+            getData: function (fun) {
+
+                setTimeout(function () {
+                    console.log("ok11");
+                    fun([{
+                        id: "Z1",
+                        text: "厂家1",
+                        children: [{
+                            id: "Z11",
+                            text: "设备1",
+                        }, {
+                            id: "Z12",
+                            text: "设备2",
+                        }]
+                    }, {
+                        id: "Z2",
+                        text: "厂家2",
+                        children: [{
+                            id: "Z21",
+                            text: "设备3",
+                        }, {
+                            id: "Z22",
+                            text: "设备4",
+                        }]
+                    }])
+
+                }, 1000);
+
+            }
+
+        }
+
+        var tp = new xqConfig.props.PropDefine('xp', '神秘选项', xtype, 1, null);
+        var yp = new xqConfig.props.PropDefine('yp', '神秘选项2', ytype, 1, null);
+
+        var sec = new xqConfig.singleEntityConfig($('#testDiv'));
+
+        var tf = function (list) {
+            return new xqConfig.props.PropDefine(list[0], list[1], list[2], list[3], list[4], list[5]);
+        };
+
+        //  var tf = xqConfig.toolFun.list2Prop;
+
+        sec.refreshGrid(
+            [
+                tf(['id', 'ID', 'text', 0, '0']),
+                tf(['name', '名称', 'text', 1, '未命名', '这是名称项目']),
+                tf(['port', '端口', 'numberbox', 1, 0]),
+                tf(['somep', '某选项', 'sp', 1, 2, '这是一个十分特别的选项啊']),
+                tp,yp,
+                tf(['xxx2', 'X选项', 'yesno', 1, null]),
+            ], {
+                id: 1,
+                name: "一个名字",
+                somep: 1,
+                xp: 2
+            },
+            function (change) {
+                console.log(change);
+            }
+        );
+    </script>
+
+</body>
+
+</html>

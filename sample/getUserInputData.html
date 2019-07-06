@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../xqConfig.wrap.js"></script>
+
+    <title>获取用户输入的实体</title>
+</head>
+
+<body>
+
+
+    <script>
+            var tf = function (list) {
+                return new xqConfig.props.PropDefine(list[0], list[1], list[2], list[3], list[4]);
+            };
+        var props = [
+            tf(['id', 'ID', 'noedit',0, '0']),
+            tf(['name', '名称', 'text',1, '未命名']),
+            tf(['port', '端口', 'numberbox',2, 0])
+        ];
+
+        var initData = {
+            id: 1,
+            name: "一个名字",
+            port: 8878
+        };
+
+        xqConfig.getUserInputData(props,'添加新项', initData, function (change) {
+            console.log(change);
+        });
+    </script>
+
+</body>
+
+</html>

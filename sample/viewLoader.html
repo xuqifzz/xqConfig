@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../xqConfig.wrap.js"></script>
+    <script src="../js/echarts.common.min.js"></script>
+    <script src="../js/xqQuery.js"></script>
+
+    <title>日志展示</title>
+</head>
+
+<body>
+    <!-- <div id='testDiv'>
+
+
+    </div> -->
+
+    <script>
+
+
+
+        var mec = new xqQuery.ViewLoader('body', true);
+        var cfgInfo = {
+            realtimeInterval:1000,
+            name:'测试变量',
+            hiValue:90,
+            loValue:30
+        };
+
+        var calcValue = function(t){
+            var secs = Math.round(t /1000);
+            var angle =  (secs % 60) / 59 * 2 * Math.PI;
+            var v = Math.round(Math.sin(angle) *500) / 10 + 60;
+            return v;
+        }
+
+        var funs = {
+            getVarValue:function(f){
+                f(calcValue(new Date().getTime()));
+            },
+            getVarLog:function(startTime,endTime,f){
+                var res = [];
+                var step = 1001*900;
+                for(var now = startTime;now< endTime; now+=step){
+                    res.push({logTime:now,value:calcValue(now)});
+                }
+                f(res);
+            }
+
+        };
+        mec.refreshViews(cfgInfo,funs);
+
+    
+
+  
+    </script>
+
+</body>
+
+</html>

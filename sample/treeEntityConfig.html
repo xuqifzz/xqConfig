@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../xqConfig.wrap.js"></script>
+
+    <title>树型实体配置</title>
+</head>
+
+<body>
+    <script>
+        var tf = function(list){
+            return new xqConfig.props.PropDefine(list[0],list[1],list[2],list[3],list[4]);
+        
+        };
+    
+
+            var tmpFieldList = [
+                tf(['title','名称','text',2,null]),
+                tf(['aaa_1','属性1','numberbox',1,null])
+        ]
+
+        var entityDefines = {
+            aaa: {
+                title: '实体1',
+                fieldList: tmpFieldList,
+                children:['bbb','ccc','ddd']
+
+            },
+            bbb: {
+                title: '实体2',
+                fieldList: tmpFieldList,
+                children:['ddd']
+
+             //   parent: 'aaa'
+            },
+            ccc: {
+                title: '实体3',
+                fieldList: tmpFieldList,
+            //    parent: 'aaa'
+            },
+            ddd: {
+                title: '实体4',
+                fieldList: tmpFieldList,
+            //    parent: 'bbb'
+            },
+
+
+        };
+
+        (function () {
+
+            var gid = 1;
+            var dbData = [];
+            var db = {};
+
+            var getChildrenCategoryNames = function (category) {
+                var res = [];
+                _.each(entityDefines, function (v, k) {
+                    if (v.parent == category) {
+                        res.push(k);
+                    }
+                })
+                return res;
+            }
+
+
+            db.addItem = function (category, content, parentId) {
+                var id = gid++;
+                content = _.clone(content);
+                var childCategorys = getChildrenCategoryNames(category)
+                _.each(childCategorys, function (childCategory) {
+                    var keyName = childCategory + "List";
+                    var childList = content[keyName];
+                    if (childList) {
+                        _.each(childList, function (child) {
+                            db.addItem(childCategory, child, id);
+                        })
+                        delete content[keyName];
+                    }
+
+                })
+
+                dbData.push({
+                    category: category,
+                    id: id,
+                    content: content,
+                    parentId: parentId
+                });
+                return id;
+            }
+
+
+
+            db.getItems = function (fun) {
+                var t1 = _.filter(dbData, fun)
+                return _.map(t1, function (item) {
+                    var tmp = _.clone(item);
+                    tmp.content = _.clone(tmp.content);
+                    return tmp;
+                })
+            }
+            db.getItem = function(category,id){
+                var res = db.getItems(function(item){
+                    return item.category == category && item.id == id;
+                });
+                if(res.length == 1){
+                    return res[0];
+                }
+                return null;
+            }
+            db.updateItem = function(category,id,values){
+                var t1 = _.filter(dbData, function(item){
+                    return item.category==category && item.id == id;
+                })
+                if(t1.length == 1){
+                    _.extend(t1[0].content,values);
+                }
+            }
+
+
+            db.deleteItem = function(category,id){
+                for(var i=0;i<dbData.length;i++){
+                    var item = dbData[i];
+                    if(item.id == id && item.category == category){
+                        item.category="";
+                        item.id = 0;
+                        break;
+                    }
+                }
+
+            }
+
+            // db.getCategoryItems = function(category){
+            //     return getItems(function(item){
+            //        return item.category == subCategory && item.parentId == id;
+            //     });
+
+            // }
+            // db.getSubItems = function(category,id,subCategory){
+            //     return getItems(function(item){
+            //        return item.category == subCategory && item.parentId == id;
+            //     });
+            // }
+            window.db = db;
+
+        })();
+
+        db.addItem('aaa', {
+            title: '一个名称',
+            aaa_1: 1,
+            bbbList: [{
+                title: '一个名称',
+                aaa_1: 1
+            }, {
+                title: '一个名称',
+                aaa_1: 1,
+                dddList: [{
+                    title: '一个名称',
+                    aaa_1: 1
+                }, {
+                    title: '一个名称',
+                    aaa_1: 1
+                }]
+            }],
+            cccList:[{
+                title: '一个名称',
+                aaa_1: 1
+            }, {
+                title: '一个名称',
+                aaa_1: 1
+            }]
+        })
+
+
+
+        var tec = new xqConfig.treeEntityConfig('body', true);
+
+
+        var funs = {
+            getAllItem: function (category,fun) {
+                var res = db.getItems(function(item){
+                   return item.category == category
+                })
+                fun(res);
+            },
+            getChildren: function (category, id, subCategory, fun) {
+                var res = db.getItems(function(item){
+                    return item.category == subCategory && item.parentId == id;
+                })
+                fun(res);
+            },
+            getItem:function(category,id,fun){
+                var res = db.getItem(category,id);
+                if(res){
+                    fun(res);
+                }
+
+                
+            },
+            updateItem:function(category,id,changes,fun){
+                db.updateItem(category,id,changes);
+                fun('ok')
+            },
+            addItem:function(category,content,parentId,fun){
+                var newId = db.addItem(category,content,parentId);
+                fun(db.getItem(category,newId));
+            },
+            deleteItem:function(category,id,fun){
+                db.deleteItem(category,id);
+                fun("ok");
+            }
+        }
+
+        tec.refreshTree(entityDefines,['aaa'], funs);
+        tec.addButton({
+            tip: '输入选中节点内容',
+        //    icon: 'icon-reload,',
+            text:'D',
+            click: function () {
+                var node = this.treeCtrl.tree("getSelected");
+                if (node == null) {
+                    return;
+                }
+                console.log(node);
+
+
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>

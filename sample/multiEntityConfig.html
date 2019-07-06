@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../xqConfig.wrap.js"></script>
+
+    <title>多实体属性配置</title>
+</head>
+
+<body>
+    <!-- <div id='testDiv'>
+
+
+    </div> -->
+
+    <script>
+        var mec = new xqConfig.multiEntityConfig('body', true);
+        xqConfig.props.regComboProp('testp',[['东边',1],['南边',2],['无',0]]);
+
+      //  var tf = xqConfig.toolFun.list2Prop;
+      var tf = function (list) {
+            return new xqConfig.props.PropDefine(list[0], list[1], list[2], list[3], list[4]);
+        };
+
+        var propList = [
+            tf(['id', 'ID', 'noedit',0, '0']),
+            tf(['name', '名称', 'text',1, '未命名']),
+            tf(['port', '端口', 'numberbox',1, 0]),
+            tf(['dtime', '时间', 'datebox',1, '']),
+            tf(['di', '方位', 'testp',1, 0]),
+            tf(['logTime', '时间', 'timestamp',2, 1520548077806])
+        ];
+        propList[0].isKey = true;
+
+        var initDataList = [];
+        var gid = 1;
+        for (; gid < 10;gid++) {
+            initDataList.push({
+                id: gid,
+                name: "名字" + gid,
+                port: 8888-gid
+            })
+        }
+
+        var funs ={
+            addFun:function(c,fun){
+                console.log(c);
+                c.id = gid++;
+                fun(c);
+            },
+            submitFun:function(c,fun){
+                console.log(c);
+                fun(1);
+            },
+            removeFun:function(c,fun){
+                console.log(c);
+                fun(1);
+            }
+        }
+
+        mec.refreshGrid(
+            propList, ['id'], initDataList,
+            funs
+        );
+        var deleteRows = function () {
+            mec.deleteData(function (deleted, fun) {
+                console.log(deleted);
+                fun(true);
+            })
+
+        }
+    </script>
+
+</body>
+
+</html>
